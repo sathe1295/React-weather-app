@@ -13,15 +13,19 @@ const apiKey = process.env.REACT_APP_API_KEY;
 const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${state}&appid=${apiKey}`;
   
   React.useEffect(() => {
+    const interval = setInterval(() => {
     fetch(apiUrl)
       .then((res) => res.json())
       .then((data) => setApiData(data));
-  }, [apiUrl]);
+      console.log("apidata", apiData)
+    },5000);
+    return () => clearInterval(interval);
+  }, [apiUrl,apiData]);
 
   const inputHandler = (event) => {
     setGetState(event.target.value);
   };
-  
+
   const submitHandler = () => {
     setState(getState);
   };
@@ -30,22 +34,6 @@ const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${state}&appid
     return (k - 273.15).toFixed(2);
   };
 return (
-    // <div className="App">
-    //   <header className="App-header">
-    //     <img src={logo} className="App-logo" alt="logo" />
-    //     <p>
-    //       Edit <code>src/App.js</code> and save to reload.
-    //     </p>
-    //     <a
-    //       className="App-link"
-    //       href="https://reactjs.org"
-    //       target="_blank"
-    //       rel="noopener noreferrer"
-    //     >
-    //       Learn React
-    //     </a>
-    //   </header>
-    // </div>
   <div className="App">
     <header className="d-flex justify-content-center align-items-center">
       <h2>React Weather App</h2>
@@ -72,52 +60,47 @@ return (
       </div>
 
       <div className="card mt-3 mx-auto" style={{ width: '60vw' }}>
-        {apiData.main ? (
+        {apiData && apiData.main ? (
           <div class="card-body text-center">
             <img
-              src={`http://openweathermap.org/img/w/${apiData.weather[0].icon}.png`}
+              src={`http://openweathermap.org/img/w/${apiData && apiData.weather[0].icon}.png`}
               alt="weather status icon"
               className="weather-icon"
             />
 
             <p className="h2">
-              {kelvinToFarenheit(apiData.main.temp)}&deg; C
+              {kelvinToFarenheit(apiData && apiData.main.temp)}&deg; C
             </p>
 
-            <p className="h5">
-              <i className="fas fa-map-marker-alt"></i>{' '}
-              <strong>{apiData.name}</strong>
-            </p>
-
-            <div className="row mt-4">
-              <div className="col-md-6">
-                <p>
-                  <i class="fas fa-temperature-low "></i>{' '}
-                  <strong>
-                    {kelvinToFarenheit(apiData.main.temp_min)}&deg; C
-                  </strong>
-                </p>
-                <p>
-                  <i className="fas fa-temperature-high"></i>{' '}
-                  <strong>
-                    {kelvinToFarenheit(apiData.main.temp_max)}&deg; C
-                  </strong>
-                </p>
-              </div>
-              <div className="col-md-6">
+            <div className="row mt-4" >
+              <div className="col-md-6 ">
                 <p>
                   {' '}
-                  <strong>{apiData.weather[0].main}</strong>
+                  <strong>{apiData && apiData.weather[0].main}</strong>
                 </p>
-                {/* <p>
-                  <strong>
-                    {' '}
-                    {countries.getName(apiData.sys.country, 'en', {
-                      select: 'official',
-                    })}
-                  </strong>
-                </p> */}
+                <p>
+                  {'Humidity'}
+                  {' '}
+                  <strong>{apiData && apiData.main.humidity}</strong>
+                </p>
+                <p>
+                  {'Wind speed'}
+                  {' '}
+                  <strong>{apiData && apiData.wind.speed}</strong>
+                </p>
+                <p>
+                  {'Precipitation'}
+                  {' '}
+                  <strong>{apiData && apiData.rain ? apiData.rain : 'Not Available' }</strong>
+                </p>
               </div>
+            </div>
+            <div>
+            <p>
+                  {'Last updated time'}
+                  {' '}
+                  <strong>now</strong>
+                </p>
             </div>
           </div>
         ) : (
