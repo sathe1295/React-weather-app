@@ -1,26 +1,43 @@
 import React from "react"
 //import logo from './logo.svg';
 import './App.css';
+import {WeatherInfo} from "./WeatherInfo";
 
 function App() {
   // State
 const [apiData, setApiData] = React.useState({});
-const [getState, setGetState] = React.useState('tamilnadu');
-const [state, setState] = React.useState('tamilnadu');
-
+const [time, setTime]= React.useState()
+const [getState, setGetState] = React.useState('pune');
+const [state, setState] = React.useState('pune');
+const [lat, setLat] = React.useState(18.51957)
+const [long, setLong] = React.useState(73.85535)
+const [yrData, setYrData] = React.useState({});
   // API KEY AND URL
 const apiKey = process.env.REACT_APP_API_KEY;
 const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${state}&appid=${apiKey}`;
+const yrApiUrl = `https://api.met.no/weatherapi/locationforecast/2.0/compact.json?lat=${lat}&lon=${long}`
+
+React.useEffect(() => {
+  const today = new Date()
   
-  React.useEffect(() => {
     const interval = setInterval(() => {
     fetch(apiUrl)
       .then((res) => res.json())
-      .then((data) => setApiData(data));
+      .then((data) => 
+      {
+        setTime(today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds())
+        setApiData(data)
+        setLat(data.coord.lat)
+        setLong(data.coord.lon)
+      });
       console.log("apidata", apiData)
+      fetch(yrApiUrl)
+      .then((response) => response.json())
+      .then((items)=> setYrData(items));
+      console.log("items", yrData)
     },5000);
     return () => clearInterval(interval);
-  }, [apiUrl,apiData]);
+  }, [apiUrl,apiData, yrApiUrl, yrData, time]);
 
   const inputHandler = (event) => {
     setGetState(event.target.value);
@@ -59,50 +76,35 @@ return (
         </button>
       </div>
 
-      <div className="card mt-3 mx-auto" style={{ width: '60vw' }}>
+      <div className=" d-flex flex-row card mt-3 mx-auto" style={{ width: '60vw' }}>
         {apiData && apiData.main ? (
-          <div class="card-body text-center">
-            <img
-              src={`http://openweathermap.org/img/w/${apiData && apiData.weather[0].icon}.png`}
-              alt="weather status icon"
-              className="weather-icon"
-            />
+          <div>
+            <h3>openweathermap</h3>
+         <WeatherInfo temperature={kelvinToFarenheit(apiData.main.temp)} humidity={apiData.main.humidity} windSpeed={apiData.wind.speed} precipitation={ apiData.rain ? apiData.rain : 'Not Available'}/>         
 
-            <p className="h2">
-              {kelvinToFarenheit(apiData && apiData.main.temp)}&deg; C
-            </p>
-
-            <div className="row mt-4" >
-              <div className="col-md-6 ">
-                <p>
-                  {' '}
-                  <strong>{apiData && apiData.weather[0].main}</strong>
-                </p>
-                <p>
-                  {'Humidity'}
-                  {' '}
-                  <strong>{apiData && apiData.main.humidity}</strong>
-                </p>
-                <p>
-                  {'Wind speed'}
-                  {' '}
-                  <strong>{apiData && apiData.wind.speed}</strong>
-                </p>
-                <p>
-                  {'Precipitation'}
-                  {' '}
-                  <strong>{apiData && apiData.rain ? apiData.rain : 'Not Available' }</strong>
-                </p>
-              </div>
-            </div>
-            <div>
-            <p>
-                  {'Last updated time'}
-                  {' '}
-                  <strong>now</strong>
-                </p>
-            </div>
+        <div>
+          <p>
+                {'Last updated time'}
+                {' '}
+                <strong>{time}</strong>
+              </p>
           </div>
+         </div>
+        ) : (
+          <h1>Loading</h1>
+        )}
+         {yrData && yrData.properties && yrData.properties.timeseries && yrData.properties.timeseries[0] ? (
+            <div>
+            <h3>yr.no</h3>
+         <WeatherInfo temperature={yrData.properties.timeseries[0].data.instant.details.air_temperature} humidity={yrData.properties.timeseries[0].data.instant.details.relative_humidity} windSpeed={yrData.properties.timeseries[0].data.instant.details.wind_speed} precipitation={ yrData.properties.timeseries[0].data.instant.details.precipitation_amount ? yrData.properties.timeseries[0].data.instant.details.precipitation_amount : 'Not Available'}/>
+        <div>
+        <p>
+              {'Last updated time'}
+              {' '}
+              <strong>{time}</strong>
+            </p>
+        </div>
+         </div>      
         ) : (
           <h1>Loading</h1>
         )}
