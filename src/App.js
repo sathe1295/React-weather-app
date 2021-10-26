@@ -12,10 +12,12 @@ const [state, setState] = React.useState('pune');
 const [lat, setLat] = React.useState(18.51957)
 const [long, setLong] = React.useState(73.85535)
 const [yrData, setYrData] = React.useState({});
+const [openWeatherForecast, setOpenWeatherForecast]= React.useState({})
   // API KEY AND URL
 const apiKey = process.env.REACT_APP_API_KEY;
 const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${state}&appid=${apiKey}`;
 const yrApiUrl = `https://api.met.no/weatherapi/locationforecast/2.0/compact.json?lat=${lat}&lon=${long}`
+const openWeatherForecastUrl =`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&exclude=current,hourly,minutely,alerts&units=metric&appid=${apiKey}`
 
 React.useEffect(() => {
   const today = new Date()
@@ -30,14 +32,21 @@ React.useEffect(() => {
         setLat(data.coord.lat)
         setLong(data.coord.lon)
       });
-      console.log("apidata", apiData)
+      //console.log("apidata", apiData)
       fetch(yrApiUrl)
       .then((response) => response.json())
       .then((items)=> setYrData(items));
-      console.log("items", yrData)
+      fetch(openWeatherForecastUrl)
+      .then((openWeatherForecastResponse)=>openWeatherForecastResponse.json())
+      .then((openForecast)=>{
+        setOpenWeatherForecast(openForecast)
+
+      console.log("openForecast", openForecast)
+      })
+     console.log("yr data", yrData)
     },5000);
     return () => clearInterval(interval);
-  }, [apiUrl,apiData, yrApiUrl, yrData, time]);
+  }, [apiUrl,apiData, yrApiUrl, yrData, time, openWeatherForecast,openWeatherForecastUrl]);
 
   const inputHandler = (event) => {
     setGetState(event.target.value);
