@@ -1,22 +1,18 @@
 import React from "react";
-//import logo from './logo.svg';
 import "./App.css";
 import { WeatherInfo } from "./components/charts/WeatherInfo";
 import { LineComparisonChart } from "./components/charts/LineComparisonChart";
-function App() {
+export const App= React.memo(() => {
   // State
-  //const [apiData, setApiData] = React.useState({});
+  const [apiData, setApiData] = React.useState({});
   const [time, setTime] = React.useState();
   const [getState, setGetState] = React.useState("kolkata");
   const [state, setState] = React.useState("pune");
   const [lat, setLat] = React.useState(18.51957);
   const [long, setLong] = React.useState(73.85535);
 
-  const openWeatherForecast = require("./openWeatherForecast.json");
-  const yrData = require("./yrJson.json");
-  const apiData = require("./openWeather.json");
-  //const [yrData, setYrData] = React.useState({});
-  //const [openWeatherForecast, setOpenWeatherForecast]= React.useState({})
+  const [yrData, setYrData] = React.useState({});
+  const [openWeatherForecast, setOpenWeatherForecast]= React.useState({})
 
   // API KEY AND URL
   const apiKey = process.env.REACT_APP_API_KEY;
@@ -29,26 +25,27 @@ function App() {
   React.useEffect(() => {
     const today = new Date();
     let tempServices = [];
-    //  const interval = setInterval(() => {
-    // fetch(apiUrl)
-    //   .then((res) => res.json())
-    //   .then((data) =>
-    //   {
-    //     setTime(today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds())
-    //     setApiData(data)
-    //     setLat(data.coord.lat)
-    //     setLong(data.coord.lon)
-    //   });
-    //   fetch(yrApiUrl)
-    //   .then((response) => response.json())
-    //   .then((items)=> setYrData(items));
-    //   fetch(openWeatherForecastUrl)
-    //   .then((openWeatherForecastResponse)=>openWeatherForecastResponse.json())
-    //   .then((openForecast)=>{
-    //     setOpenWeatherForecast(openForecast)
-    //   })
-    // },50000);
-    // return () => clearInterval(interval);
+     const interval = setInterval(() => {
+
+      setTime(today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds())
+    fetch(apiUrl)
+      .then((res) => res.json())
+      .then((data) =>
+      {
+        setApiData(data)
+        setLat(data.coord.lat)
+        setLong(data.coord.lon)
+      });
+      fetch(yrApiUrl)
+      .then((response) => response.json())
+      .then((items)=> setYrData(items));
+      fetch(openWeatherForecastUrl)
+      .then((openWeatherForecastResponse)=>openWeatherForecastResponse.json())
+      .then((openForecast)=>{
+        setOpenWeatherForecast(openForecast)
+      })
+    },5000);
+    console.log("render")
     if (apiData && apiData.main) {
       tempServices.push({
         serviceName: "OpenWeather",
@@ -81,21 +78,16 @@ function App() {
       });
     }
     setServices(tempServices);
-  }, [
-    apiUrl,
-    apiData,
-    yrApiUrl,
-    yrData,
-    time,
-    openWeatherForecast,
-    openWeatherForecastUrl,
-  ]);
+
+    return () => clearInterval(interval);
+  }, [state, time, setTime]);
 
   const inputHandler = (event) => {
     setGetState(event.target.value);
   };
 
   const submitHandler = () => {
+    console.log("submit")
     setState(getState);
   };
 
@@ -164,6 +156,4 @@ function App() {
       </div>
     </div>
   );
-}
-
-export default App;
+})

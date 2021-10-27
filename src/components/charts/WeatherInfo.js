@@ -3,7 +3,7 @@ import React from "react";
 export const WeatherInfo = React.memo((props) => {
   return (
     <div style={{display:'flex', flexDirection:'row', alignItems:"center" }} >
-      <div style={{flex:0.2, alignItems:"center"}}>
+      <div style={{flex:0.3, alignItems:"center"}}>
       <p >{props.temperature}&deg; C</p>
       </div>
       <div style={{flex: 1}}>

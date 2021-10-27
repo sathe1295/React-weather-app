@@ -6,7 +6,7 @@ export const LineComparisonChart = React.memo((props) => {
 
   React.useEffect(() => {
     createForecastData();
-  }, []);
+  }, [props]);
 
   const createForecastData = () => {
     let tempForecastData = [];
@@ -43,7 +43,6 @@ export const LineComparisonChart = React.memo((props) => {
     setForecastData(tempForecastData);
   };
 
-  console.log("props.data", props.data);
   return (
     <div
       style={{
