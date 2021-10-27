@@ -1,6 +1,6 @@
 # React-weather-app
 Comparison between two weather services- https://openweathermap.org/ and https://developer.yr.no/
-- This app compares the result of above weather services.
+- This app compares the forecast result of 7 days for above weather services.
 - The data is updated every 5 sec
 - Comparison between the two services is shown with the help of a line chart
 
