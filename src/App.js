@@ -1,115 +1,159 @@
-import React from "react"
-//import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import React from "react";
+import "./App.css";
+import { WeatherInfo } from "./components/charts/WeatherInfo";
+import { LineComparisonChart } from "./components/charts/LineComparisonChart";
+export const App= React.memo(() => {
   // State
-const [apiData, setApiData] = React.useState({});
-const [getState, setGetState] = React.useState('tamilnadu');
-const [state, setState] = React.useState('tamilnadu');
+  const [apiData, setApiData] = React.useState({});
+  const [time, setTime] = React.useState();
+  const [getState, setGetState] = React.useState("kolkata");
+  const [state, setState] = React.useState("pune");
+  const [lat, setLat] = React.useState(18.51957);
+  const [long, setLong] = React.useState(73.85535);
+
+  const [yrData, setYrData] = React.useState({});
+  const [openWeatherForecast, setOpenWeatherForecast]= React.useState({})
 
   // API KEY AND URL
-const apiKey = process.env.REACT_APP_API_KEY;
-const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${state}&appid=${apiKey}`;
-  
+  const apiKey = process.env.REACT_APP_API_KEY;
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${state}&appid=${apiKey}`;
+  const yrApiUrl = `https://api.met.no/weatherapi/locationforecast/2.0/compact.json?lat=${lat}&lon=${long}`;
+  const openWeatherForecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&exclude=current,hourly,minutely,alerts&units=metric&appid=${apiKey}`;
+
+  const [services, setServices] = React.useState([]);
+
   React.useEffect(() => {
-    const interval = setInterval(() => {
+    const today = new Date();
+    let tempServices = [];
+     const interval = setInterval(() => {
+
+      setTime(today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds())
     fetch(apiUrl)
       .then((res) => res.json())
-      .then((data) => setApiData(data));
-      console.log("apidata", apiData)
+      .then((data) =>
+      {
+        setApiData(data)
+        setLat(data.coord.lat)
+        setLong(data.coord.lon)
+      });
+      fetch(yrApiUrl)
+      .then((response) => response.json())
+      .then((items)=> setYrData(items));
+      fetch(openWeatherForecastUrl)
+      .then((openWeatherForecastResponse)=>openWeatherForecastResponse.json())
+      .then((openForecast)=>{
+        setOpenWeatherForecast(openForecast)
+      })
     },5000);
+    console.log("render")
+    if (apiData && apiData.main) {
+      tempServices.push({
+        serviceName: "OpenWeather",
+        temperature: kelvinToFarenheit(apiData.main.temp),
+        humidity: apiData.main.humidity,
+        windSpeed: apiData.wind.speed,
+        precipitation: apiData.rain ? apiData.rain : "Not Available",
+      });
+    }
+    if (
+      yrData &&
+      yrData.properties &&
+      yrData.properties.timeseries &&
+      yrData.properties.timeseries[0]
+    ) {
+      tempServices.push({
+        serviceName: "Yr.No",
+        temperature:
+          yrData.properties.timeseries[0].data.instant.details.air_temperature,
+        humidity:
+          yrData.properties.timeseries[0].data.instant.details
+            .relative_humidity,
+        windSpeed:
+          yrData.properties.timeseries[0].data.instant.details.wind_speed,
+        precipitation: yrData.properties.timeseries[0].data.instant.details
+          .precipitation_amount
+          ? yrData.properties.timeseries[0].data.instant.details
+              .precipitation_amount
+          : "Not Available",
+      });
+    }
+    setServices(tempServices);
+
     return () => clearInterval(interval);
-  }, [apiUrl,apiData]);
+  }, [state, time, setTime]);
 
   const inputHandler = (event) => {
     setGetState(event.target.value);
   };
 
   const submitHandler = () => {
+    console.log("submit")
     setState(getState);
   };
-  
+
   const kelvinToFarenheit = (k) => {
     return (k - 273.15).toFixed(2);
   };
-return (
-  <div className="App">
-    <header className="d-flex justify-content-center align-items-center">
-      <h2>React Weather App</h2>
-    </header>
-    <div className="container">
-      <div className="mt-3 d-flex flex-column justify-content-center align-items-center">
-        <div class="col-auto">
-          <label for="location-name" class="col-form-label">
-            Enter Location :
-          </label>
+  return (
+    <div style={{alignItems:"center" }}>
+      <header style={{ flex: 1, alignItems: "center", textAlign: "center" }}>
+        <h2>React Weather App</h2>
+      </header>
+      <div>
+        <div style={{flex: 1, alignItems: "center", textAlign: "center"}} >
+          <div style={{ margin: "2%" }}>
+            <label>Enter Location :</label>
+          </div>
+          <div>
+            <input
+              type="text"
+              id="location-name"
+              style={{ width: "20%" }}
+              onChange={inputHandler}
+              value={getState}
+            />
+          </div>
+          <button
+            style={{ margin: "2%", width: "10%" }}
+            onClick={submitHandler}
+          >
+            Search
+          </button>
         </div>
-        <div class="col-auto">
-          <input
-            type="text"
-            id="location-name"
-            class="form-control"
-            onChange={inputHandler}
-            value={getState}
+        <div
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            display: "flex",
+            margin: "5%",
+          }}
+        >
+          {services.map((data) => {
+            return (
+              <div style={{ flex: 1 }}>
+                <h3>{data.serviceName}</h3>
+                <WeatherInfo
+                  temperature={data.temperature}
+                  humidity={data.humidity}
+                  windSpeed={data.windSpeed}
+                  precipitation={data.precipitation}
+                />
+                <div style={{textAlign:"left"}}>
+                  <p>
+                    {"Last updated time"} <strong>{time}</strong>
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display: "flex", flex: 1 }}>
+          <LineComparisonChart
+            openWeatherForecast={openWeatherForecast}
+            yrData={yrData}
           />
         </div>
-        <button className="btn btn-primary mt-2" onClick={submitHandler}>
-          Search
-        </button>
-      </div>
-
-      <div className="card mt-3 mx-auto" style={{ width: '60vw' }}>
-        {apiData && apiData.main ? (
-          <div class="card-body text-center">
-            <img
-              src={`http://openweathermap.org/img/w/${apiData && apiData.weather[0].icon}.png`}
-              alt="weather status icon"
-              className="weather-icon"
-            />
-
-            <p className="h2">
-              {kelvinToFarenheit(apiData && apiData.main.temp)}&deg; C
-            </p>
-
-            <div className="row mt-4" >
-              <div className="col-md-6 ">
-                <p>
-                  {' '}
-                  <strong>{apiData && apiData.weather[0].main}</strong>
-                </p>
-                <p>
-                  {'Humidity'}
-                  {' '}
-                  <strong>{apiData && apiData.main.humidity}</strong>
-                </p>
-                <p>
-                  {'Wind speed'}
-                  {' '}
-                  <strong>{apiData && apiData.wind.speed}</strong>
-                </p>
-                <p>
-                  {'Precipitation'}
-                  {' '}
-                  <strong>{apiData && apiData.rain ? apiData.rain : 'Not Available' }</strong>
-                </p>
-              </div>
-            </div>
-            <div>
-            <p>
-                  {'Last updated time'}
-                  {' '}
-                  <strong>now</strong>
-                </p>
-            </div>
-          </div>
-        ) : (
-          <h1>Loading</h1>
-        )}
       </div>
     </div>
-  </div>
   );
-}
-
-export default App;
+})
