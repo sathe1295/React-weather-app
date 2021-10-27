@@ -1,21 +1,13 @@
 import React from "react";
-//import logo from './logo.svg';
-import "./App.css";
 
 export const WeatherInfo = React.memo((props) => {
   return (
-    <div style={{}}>
-      {console.log("rednererr", props)}
-      {/* <img
-  src={`http://openweathermap.org/img/w/${props.apiData && props.apiData.weather[0].icon}.png`}
-  alt="weather status icon"
-  className="weather-icon"
-/> */}
-
-      <p className="h2">{props.temperature}&deg; C</p>
-
-      <div className="row mt-4">
-        <div className="col-md-6 ">
+    <div style={{display:'flex', flexDirection:'row', alignItems:"center" }} >
+      <div style={{flex:0.2, alignItems:"center"}}>
+      <p >{props.temperature}&deg; C</p>
+      </div>
+      <div style={{flex: 1}}>
+        <div>
           <p>
             {"Humidity"} <strong>{props.humidity}</strong>
           </p>

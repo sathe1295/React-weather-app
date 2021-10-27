@@ -1,7 +1,7 @@
 import React from "react";
 //import logo from './logo.svg';
 import "./App.css";
-import { WeatherInfo } from "./WeatherInfo";
+import { WeatherInfo } from "./components/charts/WeatherInfo";
 import { LineComparisonChart } from "./components/charts/LineComparisonChart";
 function App() {
   // State
@@ -103,12 +103,12 @@ function App() {
     return (k - 273.15).toFixed(2);
   };
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{alignItems:"center" }}>
       <header style={{ flex: 1, alignItems: "center", textAlign: "center" }}>
         <h2>React Weather App</h2>
       </header>
       <div>
-        <div>
+        <div style={{flex: 1, alignItems: "center", textAlign: "center"}} >
           <div style={{ margin: "2%" }}>
             <label>Enter Location :</label>
           </div>
@@ -116,7 +116,6 @@ function App() {
             <input
               type="text"
               id="location-name"
-              //className="form-control"
               style={{ width: "20%" }}
               onChange={inputHandler}
               value={getState}
@@ -133,10 +132,8 @@ function App() {
           style={{
             flex: 1,
             flexDirection: "row",
-            alignItems: "center",
             display: "flex",
             margin: "5%",
-            backgroundColor: "yellow",
           }}
         >
           {services.map((data) => {
@@ -149,7 +146,7 @@ function App() {
                   windSpeed={data.windSpeed}
                   precipitation={data.precipitation}
                 />
-                <div>
+                <div style={{textAlign:"left"}}>
                   <p>
                     {"Last updated time"} <strong>{time}</strong>
                   </p>
