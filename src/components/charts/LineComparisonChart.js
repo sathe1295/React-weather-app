@@ -42,9 +42,9 @@ setForecastData(tempForecastData)
 
 console.log("props.data", props.data)
 return (
-  <div className="App">
+  <div style={{display:"flex", flex:1, alignItems:"center", justifyContent:"center"}}>
  <div>
-         <LineChart width={400} height={400} data={forecastData}>
+         <LineChart width={1500} height={400} data={forecastData}>
          <XAxis dataKey={'dt'} interval={0}/>
          <YAxis label={{ value: 'Temperature', angle: -90, position: 'insideLeft' }} />
           <Line type="monotone" dataKey="openWeather" stroke="#8884d8" />

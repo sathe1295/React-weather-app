@@ -5,7 +5,7 @@ import './App.css';
 export const WeatherInfo = React.memo((props) => {
 
 return (
-<div class="card-body text-center">
+<div style={{}}>
 
 {console.log("rednererr", props)}
 {/* <img

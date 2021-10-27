@@ -60,35 +60,38 @@ React.useEffect(() => {
     return (k - 273.15).toFixed(2);
   };
 return (
-  <div className="App">
-    <header className="d-flex justify-content-center align-items-center">
+  <div style={{textAlign:"center"}}>
+    <header style={{flex: 1,alignItems:"center", textAlign:"center"}}>
       <h2>React Weather App</h2>
     </header>
-    <div className="container">
-      <div className="mt-3 d-flex flex-column justify-content-center align-items-center">
-        <div className="col-auto">
-          <label for="location-name" className="col-form-label">
+    <div>
+      <div>
+        <div style={{margin:"2%"}}>
+          <label>
             Enter Location :
           </label>
         </div>
-        <div className="col-auto">
+        <div>
           <input
             type="text"
             id="location-name"
-            className="form-control"
+            //className="form-control"
+            style={{width:"20%"}}
             onChange={inputHandler}
             value={getState}
           />
         </div>
-        <button className="btn btn-primary mt-2" onClick={submitHandler}>
+        <button style={{margin:"2%", width:"10%"}} onClick={submitHandler}>
           Search
         </button>
       </div>
 
-      <div className=" d-flex flex-row card mt-3 mx-auto" style={{ width: '60vw' }}>
+      <div style={{ flex:1,  flexDirection:"row", alignItems:"center", display: "flex", margin:"5%" }}>
+        <div style={{flex:1}}>
+
+      <h3>openweathermap</h3>
         {apiData && apiData.main ? (
-          <div>
-            <h3>openweathermap</h3>
+          <div style={{flex:1}}>
          <WeatherInfo temperature={kelvinToFarenheit(apiData.main.temp)} humidity={apiData.main.humidity} windSpeed={apiData.wind.speed} precipitation={ apiData.rain ? apiData.rain : 'Not Available'}/>         
 
         <div>
@@ -100,11 +103,15 @@ return (
           </div>
          </div>
         ) : (
+          <div style={{flex:1}}>
           <h1>Loading</h1>
+          </div>
         )}
+</div>
+<div style={{flex:1}}>
+<h3>yr.no</h3>
          {yrData && yrData.properties && yrData.properties.timeseries && yrData.properties.timeseries[0] ? (
-            <div>
-            <h3>yr.no</h3>
+            <div style={{flex:1}}>
          <WeatherInfo 
           temperature={yrData.properties.timeseries[0].data.instant.details.air_temperature}
           humidity={yrData.properties.timeseries[0].data.instant.details.relative_humidity}
@@ -119,9 +126,15 @@ return (
         </div>
          </div>      
         ) : (
+          <div style={{flex:1, backgroundColor:"yellow", width:"50%"}}>
           <h1>Loading</h1>
+          </div>
         )}
-        <LineComparisonChart openWeatherForecast={openWeatherForecast} yrData={yrData}/>
+      </div>
+      </div>
+      <div style={{display:"flex", flex:1}}>
+
+      <LineComparisonChart openWeatherForecast={openWeatherForecast} yrData={yrData}/>
       </div>
     </div>
   </div>
