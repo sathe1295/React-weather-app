@@ -2,18 +2,22 @@ import React from "react"
 //import logo from './logo.svg';
 import './App.css';
 import {WeatherInfo} from "./WeatherInfo";
-
+import {LineComparisonChart} from "./components/charts/LineComparisonChart"
 function App() {
   // State
 const [apiData, setApiData] = React.useState({});
 const [time, setTime]= React.useState()
-const [getState, setGetState] = React.useState('pune');
+const [getState, setGetState] = React.useState('kolkata');
 const [state, setState] = React.useState('pune');
 const [lat, setLat] = React.useState(18.51957)
 const [long, setLong] = React.useState(73.85535)
-const [yrData, setYrData] = React.useState({});
-const [openWeatherForecast, setOpenWeatherForecast]= React.useState({})
-  // API KEY AND URL
+
+const openWeatherForecast = require("./openWeatherForecast.json")
+const yrData = require("./yrJson.json")
+//const [yrData, setYrData] = React.useState({});
+//const [openWeatherForecast, setOpenWeatherForecast]= React.useState({})
+
+// API KEY AND URL
 const apiKey = process.env.REACT_APP_API_KEY;
 const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${state}&appid=${apiKey}`;
 const yrApiUrl = `https://api.met.no/weatherapi/locationforecast/2.0/compact.json?lat=${lat}&lon=${long}`
@@ -22,30 +26,26 @@ const openWeatherForecastUrl =`https://api.openweathermap.org/data/2.5/onecall?l
 React.useEffect(() => {
   const today = new Date()
   
-    const interval = setInterval(() => {
-    fetch(apiUrl)
-      .then((res) => res.json())
-      .then((data) => 
-      {
-        setTime(today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds())
-        setApiData(data)
-        setLat(data.coord.lat)
-        setLong(data.coord.lon)
-      });
-      //console.log("apidata", apiData)
-      fetch(yrApiUrl)
-      .then((response) => response.json())
-      .then((items)=> setYrData(items));
-      fetch(openWeatherForecastUrl)
-      .then((openWeatherForecastResponse)=>openWeatherForecastResponse.json())
-      .then((openForecast)=>{
-        setOpenWeatherForecast(openForecast)
-
-      console.log("openForecast", openForecast)
-      })
-     console.log("yr data", yrData)
-    },5000);
-    return () => clearInterval(interval);
+    //  const interval = setInterval(() => {
+    // fetch(apiUrl)
+    //   .then((res) => res.json())
+    //   .then((data) => 
+    //   {
+    //     setTime(today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds())
+    //     setApiData(data)
+    //     setLat(data.coord.lat)
+    //     setLong(data.coord.lon)
+    //   });
+    //   fetch(yrApiUrl)
+    //   .then((response) => response.json())
+    //   .then((items)=> setYrData(items));
+    //   fetch(openWeatherForecastUrl)
+    //   .then((openWeatherForecastResponse)=>openWeatherForecastResponse.json())
+    //   .then((openForecast)=>{
+    //     setOpenWeatherForecast(openForecast)
+    //   })
+    // },50000);
+    // return () => clearInterval(interval);
   }, [apiUrl,apiData, yrApiUrl, yrData, time, openWeatherForecast,openWeatherForecastUrl]);
 
   const inputHandler = (event) => {
@@ -66,16 +66,16 @@ return (
     </header>
     <div className="container">
       <div className="mt-3 d-flex flex-column justify-content-center align-items-center">
-        <div class="col-auto">
-          <label for="location-name" class="col-form-label">
+        <div className="col-auto">
+          <label for="location-name" className="col-form-label">
             Enter Location :
           </label>
         </div>
-        <div class="col-auto">
+        <div className="col-auto">
           <input
             type="text"
             id="location-name"
-            class="form-control"
+            className="form-control"
             onChange={inputHandler}
             value={getState}
           />
@@ -105,7 +105,11 @@ return (
          {yrData && yrData.properties && yrData.properties.timeseries && yrData.properties.timeseries[0] ? (
             <div>
             <h3>yr.no</h3>
-         <WeatherInfo temperature={yrData.properties.timeseries[0].data.instant.details.air_temperature} humidity={yrData.properties.timeseries[0].data.instant.details.relative_humidity} windSpeed={yrData.properties.timeseries[0].data.instant.details.wind_speed} precipitation={ yrData.properties.timeseries[0].data.instant.details.precipitation_amount ? yrData.properties.timeseries[0].data.instant.details.precipitation_amount : 'Not Available'}/>
+         <WeatherInfo 
+          temperature={yrData.properties.timeseries[0].data.instant.details.air_temperature}
+          humidity={yrData.properties.timeseries[0].data.instant.details.relative_humidity}
+          windSpeed={yrData.properties.timeseries[0].data.instant.details.wind_speed}
+          precipitation={ yrData.properties.timeseries[0].data.instant.details.precipitation_amount ? yrData.properties.timeseries[0].data.instant.details.precipitation_amount : 'Not Available'}/>
         <div>
         <p>
               {'Last updated time'}
@@ -117,6 +121,7 @@ return (
         ) : (
           <h1>Loading</h1>
         )}
+        <LineComparisonChart openWeatherForecast={openWeatherForecast} yrData={yrData}/>
       </div>
     </div>
   </div>
