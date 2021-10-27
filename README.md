@@ -8,6 +8,7 @@ Comparison between two weather services- https://openweathermap.org/ and https:/
 Steps to run the app:
 1. Clone the master branch
 2. Replace the text "ENTER_YOUR_API_KEY_HERE" in .env file with your openweathermap api key
+    
     i) To generate the OpenWeathermap, follow the below steps:
       - Go to https://home.openweathermap.org
       - Create account
